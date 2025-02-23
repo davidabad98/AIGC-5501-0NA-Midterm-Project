@@ -4,7 +4,18 @@ import pandas as pd
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
+import nltk
 
+from nltk import word_tokenize
+from nltk.stem import WordNetLemmatizer, PorterStemmer
+from nltk.corpus import wordnet
+# nltk.download('punkt_tab')
+# # Ensure the resources are downloaded
+# nltk.download('averaged_perceptron_tagger_eng')
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
+# nltk.data.path.append(r'C:/Users/joyri/AppData/Roaming/nltk_data/tokenizers')
+#C:\Users\joyri\anaconda3\Lib\site-packages\nltk\tokenize\punkt.py
 def load_file(folder_path, filename, filetype):
     """
     Reads a JSON file from a specified folder 
@@ -55,73 +66,38 @@ def create_dataframe_from_json(data) ->pd.DataFrame:
     df = pd.DataFrame(records)
     return df
 
-def vectorize_text(text,vectorizer, single_text: bool):
-    # Convert titles to TF-IDF vectors
-
-    if single_text:
-        text_vector = vectorizer.transform([text])
-    else:  
-        vectorizer = TfidfVectorizer(stop_words='english')    
-        text_vector = vectorizer.fit_transform(text)
+def train_vectorizer(text, vector_file_path):
+    vectorizer = TfidfVectorizer(tokenizer=LemmaTokenizer(),stop_words='english')
+    text_vector = vectorizer.fit_transform(text)
+    joblib.dump(vectorizer, vector_file_path) #"tfidf_vectorizer.pkl" save
     return text_vector
 
-def create_cluster(df, number_of_cluster = 10) ->pd.DataFrame:
-    '''
-    We are going to create clusters based on the context of each row
-    and then assign a name to each cluster
-    '''
+def use_vectorizer(text,vectorizer):
+    # Convert titles to TF-IDF vectors
+    text_vector = vectorizer.transform(text)
+    return text_vector
 
-    input_text = vectorize_text(df['Context'],None, False)
-    # Apply K-Means clustering
-    num_clusters = number_of_cluster  # Adjust as needed
-    kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
-    df['cluster'] = kmeans.fit_predict(input_text)
-    # Determine the most common cluster for each title
-    most_common_clusters = df.groupby('Title')['cluster'].agg(lambda x: x.value_counts().idxmax())
-
-    # Map the most frequent cluster back to the dataframe
-    df['cluster'] = df['Title'].map(most_common_clusters)
-
-    # This is the dictionary used to map the cluster names to cluster
-    name_dict = {0:'Education',1:'Politics',2:'Football',3:'Countries and Empires', 4:'Warfare', 6:'Cities', 7:'Science', 8:'Language', 9:'Music'}
-
-    # Removing cluster 5 which is a mix
-    df_class = df.loc[df['cluster']!=5,:]
-    # Mapping the name to each cluster
-    df_class['topic'] = df_class['cluster'].map(name_dict)
-
-    return df_class
-
-def save_processed_dataframe(df_class, folder_path, filename):
-    file_path = os.path.join(folder_path, filename)
+def save_processed_dataframe(df_class, process_data_folder_path, process_data_file_name):
+    file_path = os.path.join(process_data_folder_path,process_data_file_name)
     df_class.to_csv(file_path)
 
-def save_model_and_metric(model,vectorizer,accuracy,report,folder_path, model_filename,vector_filename, metric_filename):
-        # Save Model and Vectorizer
-    model_file_path = os.path.join(folder_path, model_filename)
-    vector_file_path = os.path.join(folder_path, vector_filename)
-    joblib.dump(model, model_file_path)
-    joblib.dump(vectorizer, vector_file_path) #"tfidf_vectorizer.pkl"
-    # Save Model Metrics to a Text File
-    metric_file_path = os.path.join(folder_path, metric_filename)
-    with open(metric_file_path, "w") as f:
-        f.write(f"Accuracy: {accuracy}\n")
-        f.write("Classification Report:\n")
-        f.write(report)
+def get_wordnet_pos(treebank_tag):
+  if treebank_tag.startswith('J'):
+    return wordnet.ADJ
+  elif treebank_tag.startswith('V'):
+    return wordnet.VERB
+  elif treebank_tag.startswith('N'):
+    return wordnet.NOUN
+  elif treebank_tag.startswith('R'):
+    return wordnet.ADV
+  else:
+    return wordnet.NOUN
 
-    print("Model and metrics saved successfully.")
-
-if __name__ == '__main__':
-    '''
-    If you run this file it will create a csv file from the json, that has been clustered into
-    processed folder
-    '''
-    
-    folder_path = "./dataset/raw"  # Adjust path as needed
-    filename = "wiki.json"
-    data = load_file(folder_path, filename, 'json')
-    df = create_dataframe_from_json(data)
-    df_class = create_cluster(df, number_of_cluster = 10)
-    save_folder_path = "./dataset/processed"
-    save_filename = "clustered_data.csv"
-    save_processed_dataframe(df_class, save_folder_path, save_filename)
+class LemmaTokenizer:
+  def __init__(self):
+    self.wnl = WordNetLemmatizer()
+  def __call__(self, doc):
+    tokens = word_tokenize(doc) # word_tokenize is a function in NLTK
+    words_and_tags = nltk.pos_tag(tokens)
+    return [self.wnl.lemmatize(word, pos=get_wordnet_pos(tag)) \
+            for word, tag in words_and_tags]

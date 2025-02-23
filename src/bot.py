@@ -1,11 +1,12 @@
 from preprocessing import *
 from match import *
-from model import *
-
+from classification import *
+import warnings
+warnings.filterwarnings("ignore")
 # Example usage
 
 def run_bot():
-    user_question =  "Who does pyometra affect?"
+    user_question =  "When was beyonce born?"
     cm = classificationModel()
     predicted_cluster = cm.classify_question(user_question)
     

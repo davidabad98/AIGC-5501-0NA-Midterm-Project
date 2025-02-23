@@ -1,6 +1,6 @@
 from sklearn.metrics.pairwise import cosine_similarity
 from preprocessing import *
-from model import *
+from classification import *
 
 def calculate_cos_similarity(tfidf_matrix):
     # Compute cosine similarity between user question and all dataset questions
@@ -17,16 +17,16 @@ def find_best_match(user_question, df, predicted_cluster):
     text = data_text+[user_question]
     cm = classificationModel()
     model_folder_path = cm.model_folder_path
-    vector_filename = cm.model_filename
+    vector_filename = cm.vector_filename
     vectorizer = load_file(model_folder_path,vector_filename, 'pkl')
-    tfidf_matrix = vectorize_text(text,vectorizer, single_text=False)
+    tfidf_matrix = use_vectorizer(text,vectorizer)
     cosine_similarities = calculate_cos_similarity(tfidf_matrix)
 
     best_match_index = cosine_similarities.argmax()  # Get index of highest similarity
     best_match_score = cosine_similarities[best_match_index] * 100  # Convert to percentage
     
     # Retrieve best matching question and corresponding answer
-    best_question = df.iloc[best_match_index]["Question"]
-    best_answer = df.iloc[best_match_index]["Answer_Text"]
+    best_question = filtered_df.iloc[best_match_index]["Question"]
+    best_answer = filtered_df.iloc[best_match_index]["Answer_Text"]
 
     return best_question, best_answer, round(best_match_score, 2)
