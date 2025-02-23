@@ -26,6 +26,8 @@ def load_file(folder_path, filename, filetype):
             data = json.load(file)
     elif filetype == 'csv':
         data = pd.read_csv(file_path)
+    elif filetype == 'pkl':
+        data = joblib.load(file_path)
     else:
         print('Invalid file type')
 
@@ -53,10 +55,14 @@ def create_dataframe_from_json(data) ->pd.DataFrame:
     df = pd.DataFrame(records)
     return df
 
-def vectorize_text(text, stop_words = 'english'):
+def vectorize_text(text,vectorizer, single_text: bool):
     # Convert titles to TF-IDF vectors
-    vectorizer = TfidfVectorizer(stop_words=stop_words)
-    text_vector = vectorizer.fit_transform(text)
+
+    if single_text:
+        text_vector = vectorizer.transform([text])
+    else:  
+        vectorizer = TfidfVectorizer(stop_words='english')    
+        text_vector = vectorizer.fit_transform(text)
     return text_vector
 
 def create_cluster(df, number_of_cluster = 10) ->pd.DataFrame:
@@ -64,7 +70,8 @@ def create_cluster(df, number_of_cluster = 10) ->pd.DataFrame:
     We are going to create clusters based on the context of each row
     and then assign a name to each cluster
     '''
-    input_text = vectorize_text(df['Context'])
+
+    input_text = vectorize_text(df['Context'],None, False)
     # Apply K-Means clustering
     num_clusters = number_of_cluster  # Adjust as needed
     kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
@@ -89,11 +96,12 @@ def save_processed_dataframe(df_class, folder_path, filename):
     file_path = os.path.join(folder_path, filename)
     df_class.to_csv(file_path)
 
-def save_model_and_metric(model,accuracy,report,folder_path, model_filename, metric_filename):
+def save_model_and_metric(model,vectorizer,accuracy,report,folder_path, model_filename,vector_filename, metric_filename):
         # Save Model and Vectorizer
     model_file_path = os.path.join(folder_path, model_filename)
+    vector_file_path = os.path.join(folder_path, vector_filename)
     joblib.dump(model, model_file_path)
-
+    joblib.dump(vectorizer, vector_file_path) #"tfidf_vectorizer.pkl"
     # Save Model Metrics to a Text File
     metric_file_path = os.path.join(folder_path, metric_filename)
     with open(metric_file_path, "w") as f:
