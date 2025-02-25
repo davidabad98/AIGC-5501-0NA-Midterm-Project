@@ -1,0 +1,2 @@
+- We are training two vectorizer one for clustering with context another for classifying with question
+- 
