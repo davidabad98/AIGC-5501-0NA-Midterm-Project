@@ -9,13 +9,7 @@ import nltk
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer, PorterStemmer
 from nltk.corpus import wordnet
-# nltk.download('punkt_tab')
-# # Ensure the resources are downloaded
-# nltk.download('averaged_perceptron_tagger_eng')
-# nltk.download('wordnet')
-# nltk.download('omw-1.4')
-# nltk.data.path.append(r'C:/Users/joyri/AppData/Roaming/nltk_data/tokenizers')
-#C:\Users\joyri\anaconda3\Lib\site-packages\nltk\tokenize\punkt.py
+
 def load_file(folder_path, filename, filetype):
     """
     Reads a JSON file from a specified folder 

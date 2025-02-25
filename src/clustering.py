@@ -26,11 +26,11 @@ class clusteringModel:
         df['cluster'] = df['Title'].map(most_common_clusters)
 
         # This is the dictionary used to map the cluster names to cluster
-        name_dict = {0:'Education',1:'Politics',2:'Football',3:'Countries and Empires', 4:'Warfare', 6:'Cities', 7:'Science', 8:'Language', 9:'Music'}
-
+        #name_dict = {0:'Politics',1:'History and Religion',2:'Cities',3:'Language', 4:'Warfare', 6:'Football', 7:'Countries and Empires', 8:'Universities', 9:'Music'}
+        topics = ['Music', 'Miscellenous', 'Politics', 'City', 'University', 'History and Religion', 'Football', 'War', 'Language']
         # Removing cluster 5 which is a mix
-        df_class = df.loc[df['cluster']!=5,:]
-        # Mapping the name to each cluster
-        df_class['topic'] = df_class['cluster'].map(name_dict)
+        # df_class = df.loc[df['cluster']!=5,:]
+        # # Mapping the name to each cluster
+        # df_class['topic'] = df_class['cluster'].map(name_dict)
 
-        return df_class
+        return df

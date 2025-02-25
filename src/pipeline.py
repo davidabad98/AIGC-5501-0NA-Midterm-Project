@@ -3,8 +3,6 @@ from classification import *
 from clustering import *
 import warnings
 warnings.filterwarnings("ignore")
-# #tokenizer = nltk.data.load(r'C:\Users\joyri\AppData\Roaming\nltk_data\tokenizers')
-# nltk.data.path.append(r'C:/Users/joyri/AppData/Roaming/nltk_data/tokenizers')
 
 def create_data_model():
     source_folder_path = "./dataset/raw"  # Adjust path as needed

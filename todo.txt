@@ -1,0 +1,9 @@
+1) Fix the topics - Rizvan
+2) Improvement - below 50% match with dataset question,  user question is matched with context of the topic and pass the context. - Darshil/Rizvan
+3) Implementing n-grams - Navpreet
+4) Implementing Word2Vec - David
+5) Implement WordNet Synonyms - Darshil
+6) Evaluation methods of the bot - David
+7) Code cleanup - David
+7) Presentation - Navpreet
+ 
