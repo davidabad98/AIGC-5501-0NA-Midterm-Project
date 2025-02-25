@@ -67,7 +67,7 @@ def create_dataframe_from_json(data) -> pd.DataFrame:
     return df
 
 
-def train_vectorizer(text, vector_file_path):
+def train_vectorizer(text, vector_file_path,ngram_range=(1, 3)):
     """
     Trains a TF-IDF vectorizer on the given text data and saves the trained model.
 
@@ -83,7 +83,7 @@ def train_vectorizer(text, vector_file_path):
     """
 
     print("Starting TF-IDF vectorization...")
-    vectorizer = TfidfVectorizer(tokenizer=LemmaTokenizer(), stop_words="english")
+    vectorizer = TfidfVectorizer(tokenizer=LemmaTokenizer(), stop_words="english",ngram_range=ngram_range)
     text_vector = vectorizer.fit_transform(text)
     print("Vectorization complete!")
 
