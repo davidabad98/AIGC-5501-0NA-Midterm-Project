@@ -2,14 +2,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-<<<<<<< HEAD
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
-
-=======
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import accuracy_score, classification_report
->>>>>>> 15df66be4efe28d56f3aad1dcf55eb26500cd021
+
 from preprocessing import *
 
 """
@@ -22,9 +18,9 @@ question.
 class classificationModel:
 
     def __init__(self):
-        self.folder_path = './dataset/processed'
-        self.filename = 'clustered_data.csv'
-        self.model_folder_path = './model'
+        self.folder_path = "./dataset/processed"
+        self.filename = "clustered_data.csv"
+        self.model_folder_path = "./model"
         self.model_filename = "classification_model.pkl"
         self.vector_filename = "classify_vectorizer.pkl"
         self.metric_filename = "metrics.txt"
@@ -71,18 +67,20 @@ class classificationModel:
         # save the model and metric
         self.save_model_and_metric(model, accuracy, report)
 
-    def question_NB_classification_model(self):   
+    def question_NB_classification_model(self):
         # Load Data (Assuming df contains 'Question' and 'cluster')
-        df_class = load_file(self.folder_path, self.filename, 'csv')
-        X = df_class['Question']  # Text data
-        y = df_class['cluster']  # Target labels
+        df_class = load_file(self.folder_path, self.filename, "csv")
+        X = df_class["Question"]  # Text data
+        y = df_class["cluster"]  # Target labels
 
         # Convert Text to Numerical Features using TF-IDF
         vector_file_path = os.path.join(self.model_folder_path, self.vector_filename)
         X_tfidf = train_vectorizer(X, vector_file_path)  # Your TF-IDF vectorizer logic
 
         # Split Data into Train and Test Sets
-        X_train, X_test, y_train, y_test = train_test_split(X_tfidf, y, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X_tfidf, y, test_size=0.2, random_state=42
+        )
 
         # Train Naive Bayes Model
         modelNB = MultinomialNB()
@@ -101,11 +99,11 @@ class classificationModel:
         # Save the model and metric
         self.save_model_and_metric(modelNB, accuracy, report)
 
-    def classify_question(self,question):        
-        model = load_file(self.model_folder_path, self.model_filename, 'pkl')
-        vectorizer = load_file(self.model_folder_path,self.vector_filename, 'pkl')
-        #question_tfidf = vectorize_text(question,vectorizer, True)
-        question_tfidf = use_vectorizer([question],vectorizer)
+    def classify_question(self, question):
+        model = load_file(self.model_folder_path, self.model_filename, "pkl")
+        vectorizer = load_file(self.model_folder_path, self.vector_filename, "pkl")
+        # question_tfidf = vectorize_text(question,vectorizer, True)
+        question_tfidf = use_vectorizer([question], vectorizer)
         predicted_cluster = model.predict(question_tfidf)[0]  # Predict cluster
         print("Predicted cluster - {}".format(predicted_cluster))
         return predicted_cluster
@@ -123,7 +121,7 @@ class classificationModel:
             f.write(report)
 
         print("Model and metrics saved successfully.")
-    
+
     def plot_confusion_matrix(
         self,
         y_true,
