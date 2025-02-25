@@ -22,11 +22,42 @@ def find_best_match(user_question, df, predicted_cluster):
     tfidf_matrix = use_vectorizer(text,vectorizer)
     cosine_similarities = calculate_cos_similarity(tfidf_matrix)
 
-    best_match_index = cosine_similarities.argmax()  # Get index of highest similarity
-    best_match_score = cosine_similarities[best_match_index] * 100  # Convert to percentage
+    # best_match_index = cosine_similarities.argmax()  # Get index of highest similarity
+    # best_match_score = cosine_similarities[best_match_index] * 100  # Convert to percentage
     
-    # Retrieve best matching question and corresponding answer
+    # # Retrieve best matching question and corresponding answer
+    # best_question = filtered_df.iloc[best_match_index]["Question"]
+    # best_answer = filtered_df.iloc[best_match_index]["Answer_Text"]
+
+    # return best_question, best_answer, round(best_match_score, 2)
+
+    user_similarity_scores = cosine_similarities[:-1]  # Exclude self-comparison
+        # Get top 3 matches
+    top_3_indices = user_similarity_scores.argsort()[-3:][::-1]  # Sort and get top 3
+    top_3_scores = user_similarity_scores[top_3_indices] * 100  # Convert to percentage
+
+        # Retrieve the best match
+    best_match_index = top_3_indices[0]
     best_question = filtered_df.iloc[best_match_index]["Question"]
     best_answer = filtered_df.iloc[best_match_index]["Answer_Text"]
+    best_context = filtered_df.iloc[best_match_index]["Context"]
+    best_match_score = round(top_3_scores[0], 2)
 
-    return best_question, best_answer, round(best_match_score, 2)
+    top_3_questions = []
+    for idx, score in zip(top_3_indices, top_3_scores):
+        top_3_questions.append({
+            "question": filtered_df.iloc[idx]["Question"],
+            "context": filtered_df.iloc[idx]["Context"],
+            "answer": filtered_df.iloc[idx]["Answer_Text"],
+            "similarity_score": round(score, 2)
+        })
+
+    return {
+        "best_match": {
+            "question": best_question,
+            "context": best_context,
+            "answer": best_answer,
+            "similarity_score": best_match_score,
+        },
+        "top_3_similar": top_3_questions,
+    }
