@@ -22,15 +22,6 @@ def find_best_match(user_question, df, predicted_cluster):
     tfidf_matrix = use_vectorizer(text,vectorizer)
     cosine_similarities = calculate_cos_similarity(tfidf_matrix)
 
-    # best_match_index = cosine_similarities.argmax()  # Get index of highest similarity
-    # best_match_score = cosine_similarities[best_match_index] * 100  # Convert to percentage
-    
-    # # Retrieve best matching question and corresponding answer
-    # best_question = filtered_df.iloc[best_match_index]["Question"]
-    # best_answer = filtered_df.iloc[best_match_index]["Answer_Text"]
-
-    # return best_question, best_answer, round(best_match_score, 2)
-
     user_similarity_scores = cosine_similarities[:-1]  # Exclude self-comparison
         # Get top 3 matches
     top_3_indices = user_similarity_scores.argsort()[-3:][::-1]  # Sort and get top 3

@@ -26,16 +26,13 @@ class classificationModel:
         self.metric_filename = "metrics.txt"
         self.model_naive_filename = "naive_bayes_model.pkl"
 
+    # This function creates the logistic regression model
     def question_classification_model(self):
 
         df_class = load_file(self.folder_path, self.filename, "csv")
         # Load Data (Assuming df contains 'title' and 'final_cluster')
         X = df_class["Question"]  # Text data
         y = df_class["cluster"]  # Target labels
-
-        # # Convert Text to Numerical Features using TF-IDF
-        # vectorizer = TfidfVectorizer(stop_words = 'english')
-        # X_tfidf = vectorizer.fit_transform(X)
 
         vector_file_path = os.path.join(self.model_folder_path, self.vector_filename)
         X_tfidf = train_vectorizer(X, vector_file_path)
@@ -67,6 +64,7 @@ class classificationModel:
         # save the model and metric
         self.save_model_and_metric(model, accuracy, report)
 
+    # This model creates the Naive Bayes model
     def question_NB_classification_model(self):
         # Load Data (Assuming df contains 'Question' and 'cluster')
         df_class = load_file(self.folder_path, self.filename, "csv")
@@ -99,11 +97,15 @@ class classificationModel:
         # Save the model and metric
         self.save_model_and_metric(modelNB, accuracy, report)
 
+    # This function takes the user question and uses the classification model to predict the class 
     def classify_question(self, question):
+        # We are loading the treained model
         model = load_file(self.model_folder_path, self.model_filename, "pkl")
+        # We are loading the trained vectorizer
         vectorizer = load_file(self.model_folder_path, self.vector_filename, "pkl")
-        # question_tfidf = vectorize_text(question,vectorizer, True)
+        # Using the trained vectorizer on user query
         question_tfidf = use_vectorizer([question], vectorizer)
+        # Predict the class of user question
         predicted_cluster = model.predict(question_tfidf)[0]  # Predict cluster
         print("Predicted cluster - {}".format(predicted_cluster))
         return predicted_cluster

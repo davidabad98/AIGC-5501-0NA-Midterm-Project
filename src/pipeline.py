@@ -21,7 +21,7 @@ def create_data_model(choose_model='Logistic'):
 
     # load csv, classification job, save the models 
     cm = classificationModel()
-    #cm.question_classification_model()
+    # Choose which model to use for classification
     if choose_model == 'Logistic':
         cm.question_classification_model()
     else:
